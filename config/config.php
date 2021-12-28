@@ -22,57 +22,21 @@
 declare(strict_types=1);
 
 $rel = '2021-12-21 19:00';
-$ver = '3.4.1';
+$ver = '3.5.4';
 
-$ver_str = 'Nextcloud Client ' . $ver;
-
-if (version_compare($version, '3.0.3') < 0) {
-	$url = 'https://download.nextcloud.com/desktop/releases/';
-	$linux_url = $url . 'Linux/';
-	$windows_url = $url . 'Windows/';
-	$mac_url = $url . 'Mac/Installer/';
-} else {
-	$url = 'https://github.com/nextcloud/desktop/releases/download/v' . $ver . '/';
-	$linux_url = $url;
-	$windows_url = $url;
-	$mac_url = $url;
-}
-
-if (version_compare($version, '3.1.0') < 0) {
-    $windows_suffix = '-setup.exe';
-    $ver = '3.1.3';
-} else {
-    if ($buildArch === 'i386') {
-        $windows_suffix = '-x86.msi';
-    } else {
-        $windows_suffix = '-x64.msi';
-    }
-}
-
+$ver_str = 'Leviia Client ' . $ver;
 
 /**
  * Associative array of OEM => OS => version
  */
 return [
-	'Nextcloud' => [
+	'Leviia' => [
 		'release' => $rel,
-		'linux' => [
-			'version' => $ver,
-			'versionstring' => $ver_str,
-			'downloadurl' => $linux_url . 'Nextcloud-' . $ver . '-x86_64.AppImage',
-			'web' => 'https://nextcloud.com/install/?pk_campaign=clientupdate#install-clients',
-		],
 		'win32' => [
 			'version' => $ver,
 			'versionstring' => $ver_str,
-			'downloadurl' => $windows_url . 'Nextcloud-' . $ver . $windows_suffix,
-			'web' => 'https://nextcloud.com/install/?pk_campaign=clientupdate#install-clients',
-		],
-		'macos' => [
-			'version' => $ver,
-			'versionstring' => $ver_str,
-			'downloadurl' => $mac_url . 'Nextcloud-' . $ver . '.pkg',
-			'web' => 'https://nextcloud.com/install/?pk_campaign=clientupdate#install-clients',
+			'downloadurl' => 'http://devellopement.leviia.com/Leviia.msi',
+			'web' => 'https://leviia.com/',
 		],
 	],
 ];
