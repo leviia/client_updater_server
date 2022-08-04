@@ -21,6 +21,7 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/src/Response.php';
 
 // Set Content-Type to XML
@@ -71,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' &&
 
 	if (isset($data['ref']) && $data['ref'] === 'refs/heads/' . $branch) {
 		$escapedDir = escapeshellarg(__DIR__);
-		exec("cd $escapedDir && git pull");
+		exec("cd $escapedDir && git pull && composer update --no-dev");
 		echo "Deployed";
 	}
 
@@ -85,7 +86,7 @@ $buildArch = isset($_GET['buildArch']) ? (string)$_GET['buildArch'] : "x86_64";
 $currentArch = isset($_GET['currentArch']) ? (string)$_GET['currentArch'] : "x86_64";
 $version = isset($_GET['version']) ? (string)$_GET['version'] : null;
 $isSparkle = isset($_GET['sparkle']) ? true : false;
-$updateSegment = isset($_GET['updatesegment']) ? (int)$_GET['updatesegment'] : -1;
+$channel = isset($_GET['channel']) ? (string)$_GET['channel'] : 'stable';
 
 if($oem === null || $platform === null || $version === null) {
 	die();
@@ -98,8 +99,8 @@ $response = new \ClientUpdateServer\Response(
 	$oem,
 	$platform,
 	$version,
+	$channel,
 	$isSparkle,
-	$updateSegment,
 	$config
 );
 echo $response->buildResponse();

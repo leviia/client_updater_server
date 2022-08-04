@@ -29,24 +29,24 @@ class Response {
 	private $platform;
 	/** @var string */
 	private $version;
+	/** @var string */
+	private $channel;
 	/** @var bool */
 	private $isSparkle;
-	/** @var int */
-	private $updateSegment;
 	/** @var array */
 	private $config;
 
 	public function __construct(string $oem,
 								string $platform,
 								string $version,
+								string $channel,
 								bool $isSparkle,
-								int $updateSegment,
 								array $config) {
 		$this->oem = $oem;
 		$this->platform = $platform;
 		$this->version = $version;
+		$this->channel = $channel;
 		$this->isSparkle = $isSparkle;
-		$this->updateSegment = $updateSegment;
 		$this->config = $config;
 	}
 
@@ -78,26 +78,20 @@ class Response {
 			$this->config[$this->oem] = $data;
 		}
 
-		if(!isset($this->config[$this->oem][$this->platform])) {
+		if(!isset($this->config[$this->oem][$this->channel][$this->platform])) {
 			return [];
 		}
 
-		$releaseDate = new \DateTime($this->config[$this->oem]['release']);
-		$throttleDate = new \DateTime();
+		$releaseDate = new \DateTime($this->config[$this->oem][$this->channel]['release']);
+		$stable = $this->config[$this->oem]['stable'][$this->platform];
+		$beta = $this->config[$this->oem]['beta'][$this->platform];
 
-		if ($this->updateSegment === -1) {
-			$this->updateSegment = random_int(0, 99);
+		if ($this->channel == 'beta' && (version_compare($stable['version'], $beta['version']) == -1 || ($this->platform === 'macos' && $this->isSparkle === true))) {
+			return $beta;
 		}
 
-		// updateSegment is 0-99, so even fine grained control would possible
-		$chunks = floor($this->updateSegment / 10);
-		$throttleDate->sub(new \DateInterval('PT' . (12 * $chunks) . 'H'));
-
-		if ($throttleDate >= $releaseDate) {
-			$values = $this->config[$this->oem][$this->platform];
-			if(version_compare($this->version, $values['version']) === -1) {
-				return $values;
-			}
+		if (version_compare($this->version, $stable['version']) == -1 || ($this->platform === 'macos' && $this->isSparkle === true)) {
+			return $stable;
 		}
 
 		return [];
@@ -121,8 +115,8 @@ class Response {
 		$item = !empty($updateVersion) ? '<item>
 					<title>'.$updateVersion['versionstring'].'</title>
 					<pubDate>'.$this->getCurrentTimeStamp().'</pubDate>
-					<enclosure url="'.$updateVersion['downloadUrl'].'" sparkle:version="'.$updateVersion['version'].'" type="application/octet-stream" sparkle:dsaSignature="'.$updateVersion['signature'].'"/>
-					<sparkle:minimumSystemVersion>10.7.0</sparkle:minimumSystemVersion>
+					<enclosure url="'.$updateVersion['sparkleDownloadUrl'].'" sparkle:version="'.$updateVersion['version'].'" type="application/octet-stream" sparkle:edSignature="'.$updateVersion['signature'].'" length="'.$updateVersion['length'].'"/>
+					<sparkle:minimumSystemVersion>10.13.0</sparkle:minimumSystemVersion>
 				</item>' : '';
 		$xml = '<?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">

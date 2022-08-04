@@ -21,22 +21,24 @@
 
 declare(strict_types=1);
 
-$rel = '2021-12-21 19:00';
-$ver = '3.5.4';
+$stableReleaseDate = '2022-08-02 18:00';
+$stableVersion = '3.5.4';
 
-$ver_str = 'Leviia Client ' . $ver;
+$stableVersionString = 'Leviia Client ' . $stableVersion;
 
 /**
  * Associative array of OEM => OS => version
  */
 return [
 	'Leviia' => [
-		'release' => $rel,
-		'win32' => [
-			'version' => $ver,
-			'versionstring' => $ver_str,
-			'downloadurl' => 'http://devellopement.leviia.com/Leviia.msi',
-			'web' => 'https://leviia.com/',
-		],
-	],
+		'stable' => [
+			'release' => $stableReleaseDate,
+			'win32' => [
+				'version' => $stableVersion,
+				'versionstring' => $stableVersionString,
+				'downloadurl' => 'http://update.leviia.com/Leviia-' . $stableVersion . '.msi',
+				'web' => 'https://leviia.com',
+			]
+		]
+	]
 ];
